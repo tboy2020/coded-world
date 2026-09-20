@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Coded World &mdash; How Software Was Written, and Who Writes It Next</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#120818;--bg2:#1C0F2A;--bg3:#13091C;
+    --glow:rgba(217,107,160,.13);--cover-glow:rgba(217,107,160,.45);
+    --crimson:#D96BA0;--crimson-lite:#F09BC4;--crimson-deep:#A34576;
+    --gold:#E9C46A;--gold-lite:#F5D98F;--vital:#5AD1C0;--vital-lite:#86E4D7;
+    --cloud:#F5F7FA;--panel:#FAF6FA;--ink:#1E1128;--ink-soft:#544562;
+    --line:rgba(255,255,255,.14);--shadow:0 18px 44px rgba(20,4,10,.5);
+    --hero1:#1C0F2A;--hero2:#2E1B46;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--cloud);background:var(--bg1);
+    background-image:radial-gradient(1200px 600px at 50% -10%, var(--glow), transparent 60%),
+      linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 44%,var(--bg3) 100%);
+    min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 16px 130px}
+
+  /* Cover */
+  #cover{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;
+    background:radial-gradient(900px 520px at 50% 116%, var(--cover-glow), transparent 60%),linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 60%,var(--bg3) 100%)}
+  .cover-in{max-width:540px;animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  .ecg-cover{width:100%;max-width:360px;height:60px;margin:0 auto 6px;display:block}
+  .ecg-cover path{fill:none;stroke:var(--crimson-lite);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:1400;stroke-dashoffset:1400;animation:trace 2.6s ease-out .3s forwards}
+  @keyframes trace{to{stroke-dashoffset:0}}
+  .cover-eyebrow{font-family:'Saira Condensed',sans-serif;letter-spacing:.34em;text-transform:uppercase;font-size:12px;color:var(--crimson-lite);margin:14px 0 6px}
+  .cover h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:clamp(34px,9.5vw,58px);line-height:.96;margin:0;color:#fff}
+  .cover h1 span{color:var(--crimson-lite)}
+  .cover-sub{color:#e8cdd6;font-size:15px;line-height:1.55;margin:14px auto 4px;max-width:440px}
+  .verse{font-family:'Fraunces',Georgia,serif;font-style:italic;color:#f4e0d6;font-size:16px;line-height:1.55;margin:20px auto 2px;max-width:440px}
+  .verse b{display:block;font-family:'Saira Condensed',sans-serif;font-style:normal;font-weight:600;letter-spacing:.2em;font-size:11px;color:var(--crimson-lite);margin-top:8px;text-transform:uppercase}
+  .field{margin:18px auto 0;max-width:340px;text-align:left}
+  .field label{display:block;font-family:'Saira Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-size:11px;color:#d3aeb9;margin:0 4px 6px}
+  .field input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-size:16px;font-family:inherit}
+  .field input:focus{outline:none;border-color:var(--crimson);background:rgba(255,255,255,.1)}
+  .btn{cursor:pointer;border:none;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .btn-go{display:inline-block;margin-top:22px;padding:15px 40px;border-radius:999px;font-size:16px;color:#2a0810;background:linear-gradient(180deg,var(--crimson-lite),var(--crimson));box-shadow:0 10px 26px rgba(0,0,0,.4)}
+  .btn-go:active{transform:translateY(1px)}
+  .cover-foot{margin-top:16px;font-family:'Saira Condensed',sans-serif;letter-spacing:.16em;font-size:11px;color:#a6808c;text-transform:uppercase}
+
+  /* Hero */
+  .hero{position:relative;padding:26px 20px 22px;margin:16px 0 6px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,var(--hero1) 0%,var(--hero2) 100%);border:1px solid var(--line);box-shadow:var(--shadow)}
+  .hero:before{content:"";position:absolute;left:-10%;right:-10%;bottom:-40%;height:80%;background:radial-gradient(closest-side, var(--cover-glow), transparent);pointer-events:none}
+  .hero-mon{position:absolute;top:0;left:0;right:0;height:44px;opacity:.5;pointer-events:none}
+  .hero-mon path{fill:none;stroke:var(--vital-lite);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hero-top{position:relative;display:flex;align-items:center;gap:10px;z-index:2}
+  .hero-badge{font-family:'Saira Condensed',sans-serif;letter-spacing:.18em;font-size:12px;color:#f0d3db;border:1px solid rgba(255,255,255,.22);padding:5px 10px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .edit{margin-left:auto;background:rgba(255,255,255,.08);border:1px solid var(--line);color:#e6ccd4;border-radius:9px;padding:7px 11px;font-size:12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;letter-spacing:.12em}
+  .hero h2{position:relative;z-index:2;font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:clamp(26px,7vw,40px);line-height:1;margin:16px 0 2px}
+  .hero h2 small{display:block;font-size:13px;letter-spacing:.28em;color:var(--crimson-lite);font-weight:600;margin-bottom:5px}
+  .hero-mission{position:relative;z-index:2;font-family:'Fraunces',serif;font-style:italic;color:#f2d9c9;font-size:15px;margin-top:8px;line-height:1.5;min-height:1px}
+  .hero-mission b{color:var(--gold-lite);font-style:normal;font-weight:600}
+  .gauge{position:relative;z-index:2;margin-top:16px}
+  .gauge-top{display:flex;justify-content:space-between;align-items:baseline;font-family:'Saira Condensed',sans-serif;letter-spacing:.14em;font-size:12px;color:#e6ccd4;text-transform:uppercase}
+  .gauge-top b{color:var(--gold-lite);font-size:15px}
+  .bar{height:10px;border-radius:999px;background:rgba(0,0,0,.3);margin-top:8px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+  .bar > i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--vital),var(--crimson-lite),var(--gold));transition:width .8s cubic-bezier(.2,.7,.2,1)}
+
+  /* Tabs */
+  .tabs{position:sticky;top:0;z-index:20;display:flex;gap:6px;padding:10px 4px;margin:8px -4px 6px;overflow-x:auto;background:linear-gradient(180deg,var(--bg1),rgba(23,9,18,.72));backdrop-filter:blur(8px);scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#e0c2cb;font-family:'Saira Condensed',sans-serif;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px;padding:10px 14px;border-radius:11px;white-space:nowrap;transition:.2s}
+  .tab.on{background:linear-gradient(180deg,var(--crimson-lite),var(--crimson));color:#2a0810;border-color:transparent}
+  .view{display:none;animation:fade .35s ease both}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .lead{font-family:'Fraunces',serif;font-style:italic;font-size:16px;line-height:1.5;color:#f0e2ea;margin:14px 6px 20px}
+
+  /* Timeline (ECG spine) */
+  .era{position:relative;margin-bottom:12px}
+  .era-head{position:relative;z-index:2;display:flex;align-items:baseline;gap:12px;padding:6px 2px 12px}
+  .era-decade{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:30px;color:var(--gold-lite);line-height:1}
+  .era-theme{font-family:'Saira Condensed',sans-serif;font-weight:600;letter-spacing:.04em;font-size:15px;color:#e9cfd8;text-transform:uppercase}
+  .beat{position:relative;padding-left:56px;margin-bottom:10px}
+  .beat .spine{position:absolute;left:20px;top:-6px;bottom:-16px;width:2px;background:linear-gradient(180deg,rgba(228,87,110,.15),var(--crimson) 40%,var(--crimson) 60%,rgba(228,87,110,.15))}
+  .beat .pulse{position:absolute;left:9px;top:16px;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--hero2), var(--hero1));border:2px solid var(--crimson);z-index:2}
+  .beat.read .pulse{background:linear-gradient(180deg,var(--vital-lite),var(--vital));border-color:var(--vital-lite)}
+  .beat .pulse:after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:var(--crimson-lite);transform:translate(-50%,-50%)}
+  .beat.read .pulse:after{background:#0d3a33}
+  .mrow{cursor:pointer;background:var(--panel);color:var(--ink);border-radius:14px;padding:13px 15px;box-shadow:0 12px 26px rgba(20,4,10,.32);display:flex;align-items:center;gap:12px;transition:transform .12s}
+  .mrow:active{transform:scale(.99)}
+  .mrow .yr{flex:0 0 auto;font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--crimson-deep);width:46px}
+  .mrow .mtitle{flex:1;font-size:15px;line-height:1.35;font-weight:600;color:var(--ink)}
+  .mrow .tagp{display:inline-block;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.06em;font-size:10px;padding:2px 7px;border-radius:5px;margin-top:5px;text-transform:uppercase}
+  .p-us{background:rgba(196,50,75,.14);color:var(--crimson-deep)}
+  .p-int{background:rgba(63,184,160,.16);color:#1f7a6c}
+  .mrow .chev{flex:0 0 auto;color:var(--crimson-deep);font-size:24px;font-weight:700;opacity:.6}
+
+  /* Frontier / Problems cards */
+  .fcard{position:relative;cursor:pointer;background:var(--panel);color:var(--ink);border-radius:16px;padding:16px 16px 16px 58px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .fcard .ic{position:absolute;left:15px;top:16px;width:30px;height:30px;font-size:19px;display:flex;align-items:center;justify-content:center}
+  .fcard h4{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:19px;margin:0 0 3px;color:var(--ink)}
+  .fcard p{font-size:13.5px;line-height:1.5;color:#4a3038;margin:0}
+  .fcard .chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--crimson-deep);font-size:24px;font-weight:700;opacity:.55}
+  .ptag{display:inline-block;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:10px;padding:3px 9px;border-radius:6px;margin-bottom:7px}
+  .t-open{background:rgba(228,199,119,.24);color:#8a6412}
+  .t-near{background:rgba(63,184,160,.18);color:#1f7a6c}
+
+  /* Mission tab */
+  .m-head{background:linear-gradient(180deg,var(--hero2),var(--hero1));border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .m-head:before{content:"\2710";position:absolute;top:-14px;right:6px;font-size:120px;color:rgba(255,255,255,.05);line-height:1}
+  .m-head h3{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:25px;margin:0 0 6px;color:var(--crimson-lite)}
+  .m-head p{font-size:14.5px;line-height:1.55;color:#e6d2da;margin:0}
+  .m-current{background:rgba(228,199,119,.1);border:1px solid rgba(228,199,119,.4);border-radius:14px;padding:16px;margin-bottom:16px}
+  .m-current .lbl{font-family:'Saira Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:var(--gold-lite);margin-bottom:6px}
+  .m-current .val{font-family:'Fraunces',serif;font-style:italic;font-size:19px;line-height:1.4;color:#fff}
+  .m-current .val b{font-style:normal;font-weight:600;color:var(--gold-lite)}
+  .mopt{cursor:pointer;background:var(--panel);color:var(--ink);border-radius:14px;padding:15px 16px;margin-bottom:11px;box-shadow:0 12px 26px rgba(20,4,10,.3);border:2px solid transparent;transition:.15s;position:relative}
+  .mopt.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(228,199,119,.3),0 12px 26px rgba(20,4,10,.3)}
+  .mopt h5{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:17px;margin:0 0 3px;color:var(--ink)}
+  .mopt p{font-size:13.5px;line-height:1.45;color:#4a3038;margin:0}
+  .mopt .pick{margin-top:9px;display:inline-block;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px;color:var(--crimson-deep)}
+  .mopt.sel .pick{color:#1f7a6c}
+  .mopt.sel .pick:before{content:"\2713 "}
+
+  /* Mentors */
+  .hero-story{position:relative;cursor:pointer;background:linear-gradient(180deg,var(--hero2),var(--hero1));border:1px solid var(--gold);border-radius:18px;padding:22px 20px;margin-bottom:20px;box-shadow:var(--shadow);overflow:hidden}
+  .hero-story:before{content:"\2699";position:absolute;top:-16px;right:2px;font-size:110px;color:rgba(228,199,119,.08);line-height:1}
+  .hs-eyebrow{font-family:'Saira Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:var(--gold-lite)}
+  .hero-story h3{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:27px;margin:5px 0 7px;color:#fff}
+  .hero-story p{font-size:14.5px;line-height:1.55;color:#e9d3c8;margin:0 0 12px;max-width:92%}
+  .hs-open{font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:#2a0810;background:linear-gradient(180deg,var(--gold-lite),var(--gold));padding:9px 15px;border-radius:9px;display:inline-block}
+  .mentor-h{font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:15px;color:var(--crimson-lite);margin:6px 2px 14px}
+  .res{background:var(--panel);color:var(--ink);border-radius:15px;padding:16px 17px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .res .now{font-family:'Saira Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:#2a0810;background:var(--gold-lite);display:inline-block;padding:4px 10px;border-radius:7px;margin-bottom:8px;font-weight:700}
+  .res h4{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:18px;margin:0 0 2px;color:var(--ink)}
+  .res .tagline{font-family:'Saira Condensed',sans-serif;letter-spacing:.06em;font-size:12px;color:var(--crimson-deep);text-transform:uppercase;margin-bottom:8px}
+  .res p{font-size:14px;line-height:1.5;color:#3a2028;margin:0 0 10px}
+  .res .fact{font-size:13px;color:var(--ink-soft);margin:0 0 4px;padding-left:20px;position:relative}
+  .res .fact:before{content:"\2714";position:absolute;left:0;top:0;color:var(--crimson-deep)}
+  .res a{display:inline-block;margin-top:8px;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:#2a0810;text-decoration:none;background:linear-gradient(180deg,var(--gold-lite),var(--gold));padding:9px 16px;border-radius:9px}
+  .scrip{margin:8px 2px 0;padding:14px 15px;border-left:3px solid var(--crimson);background:rgba(0,0,0,.2);border-radius:0 12px 12px 0}
+  .scrip p{font-family:'Fraunces',serif;font-style:italic;font-size:15px;line-height:1.5;color:#f4e6ee;margin:0}
+  .scrip b{display:block;font-family:'Saira Condensed',sans-serif;font-style:normal;letter-spacing:.16em;font-size:11px;color:var(--crimson-lite);margin-top:7px;text-transform:uppercase}
+
+  /* Brief screen */
+  .brief-screen{position:fixed;inset:0;z-index:70;background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);transform:translateX(100%);transition:transform .32s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column}
+  .brief-screen.open{transform:none}
+  .brief-bar{flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:16px 16px 10px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.25)}
+  .back{background:rgba(255,255,255,.08);border:1px solid var(--line);color:#f0dae1;border-radius:10px;padding:9px 14px;font-family:'Saira Condensed',sans-serif;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:13px;cursor:pointer}
+  .brief-tag{margin-left:auto;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;font-size:12px;color:#2a0810;background:linear-gradient(180deg,var(--gold-lite),var(--gold));padding:5px 11px;border-radius:8px}
+  .brief-body{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 18px 32px;max-width:780px;width:100%;margin:0 auto}
+  .brief-eyebrow{font-family:'Saira Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--crimson-lite)}
+  .brief-title{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:clamp(26px,7vw,38px);line-height:1.02;margin:6px 0 4px;color:#fff}
+  .brief-meta{font-family:'Saira Condensed',sans-serif;letter-spacing:.06em;font-size:12.5px;color:var(--vital-lite);text-transform:uppercase;margin-bottom:16px}
+  .blk{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:13px}
+  .blk-h{font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px;color:var(--crimson-lite);margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .blk p{margin:0;font-size:15px;line-height:1.58;color:#f0e2ea}
+  .factline{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:#e8d6de;margin-bottom:7px;line-height:1.45}
+  .factline:last-child{margin-bottom:0}
+  .factline b{color:var(--gold-lite);flex:0 0 auto}
+  .q{margin-bottom:6px}
+  .q .qq{font-size:15px;font-weight:600;color:#fff;margin-bottom:9px;line-height:1.4}
+  .opt{display:block;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#f0e2ea;border-radius:10px;padding:11px 13px;margin-bottom:7px;font-size:14.5px;cursor:pointer;font-family:inherit;transition:.15s}
+  .opt.correct{background:rgba(63,184,160,.32);border-color:var(--vital);color:#fff}
+  .opt.wrong{background:rgba(196,50,75,.3);border-color:var(--crimson-lite)}
+  .opt:disabled{cursor:default}
+  .qex{font-size:13.5px;color:#e0c2cb;margin-top:7px;line-height:1.5;display:none}
+  .qex.show{display:block}
+  .lnk{display:inline-block;margin:0 8px 8px 0;font-family:'Saira Condensed',sans-serif;font-weight:600;letter-spacing:.05em;font-size:14px;color:#f0dae1;text-decoration:none;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:10px 14px;border-radius:10px}
+  .lnk:after{content:" \2197";color:var(--gold-lite)}
+  .brief-scrip{background:rgba(0,0,0,.24);border-left:3px solid var(--crimson);border-radius:0 12px 12px 0;padding:14px 15px;margin-bottom:6px}
+  .brief-scrip p{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:#f4e6ee;margin:0;line-height:1.55}
+  .brief-scrip b{display:block;font-family:'Saira Condensed',sans-serif;font-style:normal;letter-spacing:.14em;font-size:11px;color:var(--crimson-lite);margin-top:7px;text-transform:uppercase}
+  .say{margin-top:4px;background:none;border:1px solid var(--crimson-lite);color:var(--crimson-lite);border-radius:8px;padding:7px 13px;font-size:12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+  .brief-foot{flex:0 0 auto;padding:14px 16px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:rgba(0,0,0,.3)}
+  .foot-btn{width:100%;max-width:744px;margin:0 auto;display:block;padding:15px;border-radius:13px;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:15px;cursor:pointer;border:none}
+  .foot-btn.claim{color:#2a0810;background:linear-gradient(180deg,var(--gold-lite),var(--gold))}
+  .foot-btn.claimed{color:#eaf0f6;background:rgba(63,184,160,.3);border:1px solid var(--vital)}
+
+  .footer{text-align:center;margin-top:26px;font-family:'Saira Condensed',sans-serif;letter-spacing:.2em;font-size:11px;color:#8a6874;text-transform:uppercase}
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(30px);z-index:80;background:linear-gradient(180deg,var(--gold-lite),var(--gold));color:#2a0810;font-family:'Saira Condensed',sans-serif;font-weight:700;letter-spacing:.06em;padding:12px 20px;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.45);opacity:0;transition:.35s;font-size:14px;max-width:88%;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #cfx{position:fixed;inset:0;pointer-events:none;z-index:75}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.ecg-cover path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<section id="cover">
+  <div class="cover-in">
+    <svg class="ecg-cover" viewBox="0 0 360 60" aria-hidden="true"><path d="M8,12 L120,12 M32,26 L214,26 M56,40 L168,40 M32,54 L150,54"/></svg>
+    <div class="cover-eyebrow">A living history of software</div>
+    <h1>THE CODED<br><span>WORLD</span></h1>
+    <p class="cover-sub">From Ada Lovelace&rsquo;s first algorithm to machines that write their own code &mdash; and the problems still waiting for the next engineer. Made for a young builder to find her calling.</p>
+    <div class="verse">&ldquo;Write the vision, and make it plain upon tables, that he may run that readeth it.&rdquo;<b>Habakkuk 2:2</b></div>
+    <div class="field">
+      <label for="nm">Who is exploring today?</label>
+      <input id="nm" type="text" placeholder="Enter your name" autocomplete="off" />
+    </div>
+    <button class="btn btn-go" id="begin">Begin the journey</button>
+    <div class="cover-foot">For Peace &amp; family &middot; Glory to God alone</div>
+  </div>
+</section>
+
+<div class="wrap" id="app" style="display:none">
+  <div class="hero">
+    <svg class="hero-mon" viewBox="0 0 780 44" preserveAspectRatio="none" aria-hidden="true"><path d="M20,8 L300,8 M60,18 L540,18 M100,28 L430,28 M60,38 L360,38"/></svg>
+    <div class="hero-top"><span class="hero-badge" id="badge">&#9998; The Code</span><button class="edit" id="editBtn">Edit</button></div>
+    <h2><small>The story so far, builder</small><span id="heroName">&nbsp;</span></h2>
+    <div class="hero-mission" id="heroMission"></div>
+    <div class="gauge"><div class="gauge-top"><span>Story explored</span><b id="pct">0%</b></div><div class="bar"><i id="barFill"></i></div></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-v="story">The Story</button>
+    <button class="tab" data-v="frontier">The Frontier</button>
+    <button class="tab" data-v="problems">Open Problems</button>
+    <button class="tab" data-v="mentors">Mentors</button>
+    <button class="tab" data-v="mission">Your Mission</button>
+  </div>
+
+  <div class="view on" id="v-story">
+    <p class="lead">Indented lines run down this page, like code. Every one is a moment that changed what software could do &mdash; in America and around the world. Tap any one to open its story.</p>
+    <div id="timeline"></div>
+  </div>
+  <div class="view" id="v-frontier">
+    <p class="lead">Where software is heading in the next ten years &mdash; and which skills survive the machines that now write code. Tap to go deeper.</p>
+    <div id="frontierList"></div>
+  </div>
+  <div class="view" id="v-problems">
+    <p class="lead">These are the great unsolved challenges of software. Not dead ends &mdash; invitations. Read each one and ask: <em>could this be mine?</em></p>
+    <div id="problemList"></div>
+  </div>
+  <div class="view" id="v-mentors">
+    <p class="lead">No one builds alone. Here is a woman who walked this road in Ohio &mdash; and real doors where Peace can find her own mentors.</p>
+    <div class="hero-story" id="carsonCard">
+      <div class="hs-eyebrow">A story to carry</div>
+      <h3>Annie Easley</h3>
+      <p>She was hired at NASA in Cleveland as a &ldquo;human computer&rdquo;. Then machines took that job entirely &mdash; so she learned to program the machines. Tap to read the most important story in this app.</p>
+      <span class="hs-open">Read his story &#8250;</span>
+    </div>
+    <div class="mentor-h">Find your mentors</div>
+    <div id="mentorList"></div>
+    <div class="scrip" style="margin-top:6px"><p>&ldquo;Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.&rdquo;</p><b>Proverbs 27:17</b></div>
+  </div>
+  <div class="view" id="v-mission">
+    <div class="m-head"><h3>Choose your mountain</h3><p>The best engineers don&rsquo;t just build &mdash; they carry a problem their whole life. Pick the one that stirs you most. It becomes your north star, from day one.</p></div>
+    <div class="m-current" id="mCurrent" style="display:none"><div class="lbl">Peace&rsquo;s mission</div><div class="val" id="mCurrentVal"></div></div>
+    <div id="missionList"></div>
+  </div>
+  <div class="footer">The Coded World &middot; v1 &middot; Glory to God alone</div>
+</div>
+
+<div class="brief-screen" id="brief" aria-hidden="true">
+  <div class="brief-bar"><button class="back" id="backBtn">&larr; Back</button><span class="brief-tag" id="briefTag"></span></div>
+  <div class="brief-body" id="briefBody"></div>
+  <div class="brief-foot" id="briefFoot" style="display:none"><button class="foot-btn claim" id="claimBtn">Make this my mission</button></div>
+</div>
+<div id="toast"></div>
+<canvas id="cfx"></canvas>
+
+<script>
+function lsGet(k){try{return window.localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{window.localStorage.setItem(k,v);}catch(e){}}
+var K={name:'cw_name',read:'cw_read',mission:'cw_mission'};
+var state={name:'',read:{},mission:''};
+function loadState(){state.name=lsGet(K.name)||'';state.mission=lsGet(K.mission)||'';
+  try{state.read=JSON.parse(lsGet(K.read)||'{}');}catch(e){state.read={};}}
+function saveRead(){lsSet(K.read,JSON.stringify(state.read));}
+
+/* ---------------- DATA ---------------- */
+var ERAS=[
+ {decade:'1840s\u20131940s',theme:'The idea before the machine',beats:[
+  {id:'w1843',yr:'1843',place:'int',title:'A woman writes the first program \u2014 before computers existed',
+   brief:{eyebrow:'The first programmer',why:'Ada Lovelace, working in England on notes about Charles Babbage\u2019s proposed Analytical Engine, wrote out a step-by-step method for the machine to compute a sequence of numbers. It is widely regarded as the first algorithm intended to be carried out by a machine. More than that, she saw further than Babbage himself: she understood the machine could manipulate symbols and not merely numbers \u2014 that it could, in principle, do far more than arithmetic. The machine was never built in her lifetime. She was right anyway.',
+     facts:[['Who','Ada Lovelace, England'],['What','The first algorithm written for a machine'],['Her insight','That a computer could work with symbols, not just numbers'],['Worth knowing','Software began with a woman\u2019s imagination']],
+     quiz:[{q:'What is remarkable about the first computer program?',opts:['It was written before any computer existed','It was written last year','It was written by a machine'],a:0,ex:'Ada Lovelace wrote it for a machine that was never built in her lifetime. She imagined software before hardware existed.'}],
+     scrip:{t:'Write the vision, and make it plain upon tables, that he may run that readeth it.',r:'Habakkuk 2:2'}}},
+  {id:'w1936',yr:'1936',place:'int',title:'Turing imagines a machine that can do anything',
+   brief:{eyebrow:'The theory beneath everything',why:'Alan Turing described an imaginary machine that could carry out any calculation if given the right instructions. This idea \u2014 the universal machine \u2014 is the theoretical foundation of every computer since. It said something startling: you do not need a different machine for every job. You need one machine and different software.',
+     facts:[['The idea','One machine, any task, given the right instructions'],['Why it matters','This is why software exists at all']]}},
+  {id:'w1945',yr:'1945\u201347',place:'us',title:'Six women program the first electronic computer',
+   brief:{eyebrow:'The forgotten pioneers',why:'ENIAC, one of the first general-purpose electronic computers, was programmed by a team of six women who worked out how to make it run without manuals or programming languages \u2014 because neither existed yet. They were largely uncredited for decades. Around the same period, a moth found trapped in a relay at Harvard was taped into a logbook, helping popularise the word every programmer now uses: a bug.',
+     facts:[['Who','The six ENIAC programmers'],['The challenge','No manuals, no languages \u2014 they invented the practice'],['The word','\u201cBug\u201d entered the language around this era']]}}
+ ]},
+ {decade:'1950s\u201360s',theme:'Teaching machines our words',beats:[
+  {id:'w1952',yr:'1952',place:'us',title:'Grace Hopper builds the first compiler',
+   brief:{eyebrow:'Machines learn to translate',why:'Grace Hopper believed programmers should be able to write instructions in something closer to English, with the computer translating it into machine code. Colleagues told her computers could not do that. She built it anyway. Her work led directly to COBOL and to the whole idea of programming languages \u2014 which means every language Peace will ever write traces back to a woman who was told it was impossible.',
+     facts:[['Who','Grace Hopper, United States'],['What','The compiler \u2014 translating human-readable code into machine code'],['Legacy','Led to COBOL and to programming languages themselves']],
+     scrip:{t:'With God all things are possible.',r:'Matthew 19:26'}}},
+  {id:'w1955',yr:'1955',place:'us',title:'Annie Easley walks into NASA in Cleveland',
+   brief:{eyebrow:'Ohio\u2019s own',why:'Annie Easley read a newspaper story about twin sisters working as \u201chuman computers\u201d in Cleveland, applied, and was hired within two weeks \u2014 one of only four African Americans among around 2,500 people in her division. She would stay 34 years. Read her full story in the Mentors tab: it is the most important story in this app.',
+     facts:[['Where','NACA Lewis, Cleveland, Ohio \u2014 now NASA Glenn'],['Started as','A \u201chuman computer\u201d doing calculations by hand'],['Became','A computer scientist whose code helped launch rockets']]}},
+  {id:'w1957',yr:'1957\u201359',place:'us',title:'FORTRAN and COBOL \u2014 real languages arrive',
+   brief:{eyebrow:'Software becomes a craft',why:'FORTRAN gave scientists and engineers a language for calculation; COBOL gave business a readable one. For the first time, people could write programs without thinking in raw machine instructions. Remarkably, COBOL still runs financial systems today, decades later \u2014 a reminder that well-built software can outlive its builders.',
+     facts:[['FORTRAN','For science and engineering'],['COBOL','For business \u2014 still running banks today']]}},
+  {id:'w1969',yr:'1968\u201369',place:'us',title:'Margaret Hamilton names the profession \u2014 and lands on the moon',
+   brief:{eyebrow:'Software engineering is born',why:'Margaret Hamilton led the team that wrote the onboard flight software for the Apollo missions, and she pushed to have the work called software engineering \u2014 insisting it deserved the same seriousness as any other engineering discipline. During the Apollo 11 landing, her software\u2019s priority design let the computer shed less important tasks under overload rather than fail. The landing continued. The name stuck, and the field Peace is entering carries it.',
+     facts:[['Who','Margaret Hamilton, MIT / NASA Apollo'],['Coined','The term \u201csoftware engineering\u201d'],['Apollo 11','Her design kept the computer working under overload during the landing']],
+     quiz:[{q:'Who pushed for the term \u201csoftware engineering\u201d?',opts:['Margaret Hamilton','Bill Gates','Steve Jobs'],a:0,ex:'Margaret Hamilton, who led the Apollo flight software team \u2014 she insisted the work deserved to be called engineering.'}],
+     scrip:{t:'Whatsoever thy hand findeth to do, do it with thy might.',r:'Ecclesiastes 9:10'}}}
+ ]},
+ {decade:'1970s',theme:'The foundations we still stand on',beats:[
+  {id:'w1970',yr:'1970',place:'us',title:'The relational database',
+   brief:{eyebrow:'How the world stores everything',why:'Edgar Codd proposed organising data into simple related tables that could be questioned with a language rather than hunted through by hand. Almost every application Peace will ever build will store its data this way.',
+     facts:[['The idea','Data in tables, asked questions with a language'],['Today','The backbone of nearly every application']]}},
+  {id:'w1973',yr:'1969\u201373',place:'us',title:'UNIX and the C language',
+   brief:{eyebrow:'The quiet foundation',why:'At Bell Labs, Ken Thompson and Dennis Ritchie built the UNIX operating system and the C language. Their ideas \u2014 small tools that do one thing well and combine cleanly \u2014 still shape how good software is designed. Linux, macOS and Android all descend from that thinking.',
+     facts:[['Where','Bell Labs, United States'],['The principle','Small pieces, each doing one thing well'],['Descendants','Linux, macOS, Android']]}}
+ ]},
+ {decade:'1980s\u201390s',theme:'Software for everyone',beats:[
+  {id:'w1989',yr:'1989\u201391',place:'int',title:'Tim Berners-Lee invents the World Wide Web',
+   brief:{eyebrow:'The world gets connected',why:'Working at CERN in Switzerland, Tim Berners-Lee proposed and built a system of linked documents readable by anyone with a browser. Crucially, it was given away freely rather than sold. That decision is why the web became a commons the whole world could build on \u2014 and why a girl in Ohio can publish a page the entire planet can read.',
+     facts:[['Where','CERN, Switzerland'],['The decision','Released freely, not licensed'],['The result','Anyone, anywhere, can publish']],
+     scrip:{t:'Freely ye have received, freely give.',r:'Matthew 10:8'}}},
+  {id:'w1991',yr:'1991',place:'int',title:'Linux and the open-source movement',
+   brief:{eyebrow:'Software built by everyone',why:'A Finnish student named Linus Torvalds shared an operating system kernel he was writing and invited others to improve it. That model \u2014 thousands of strangers collaborating on code anyone can read \u2014 now runs most of the internet, most phones, and most of the cloud. It also means a teenager can read the source of world-class software for free.',
+     facts:[['Started by','A student sharing his hobby project'],['Today','Runs most servers, phones and cloud infrastructure'],['The gift','You can read and learn from real professional code']]}},
+  {id:'w1995',yr:'1995',place:'us',title:'Java and JavaScript',
+   brief:{eyebrow:'Code for every device and every page',why:'Java promised code that could run anywhere; JavaScript, written in a famously short burst of time, made web pages interactive. Decades later, JavaScript remains the language of the web \u2014 proof that rough beginnings can still build enduring things.',
+     facts:[['Java','Write once, run on many devices'],['JavaScript','Made the web interactive \u2014 and still does']]}}
+ ]},
+ {decade:'2000s\u201310s',theme:'Scale, cloud and collaboration',beats:[
+  {id:'w2005',yr:'2005',place:'int',title:'Git \u2014 how the world now writes code together',
+   brief:{eyebrow:'Collaboration solved',why:'Linus Torvalds built Git to manage the Linux kernel: a system letting thousands of people change the same codebase without destroying each other\u2019s work. Combined with GitHub, it became the way software is written everywhere \u2014 and the place engineers now prove what they can do.',
+     facts:[['Why','Thousands of people editing the same code safely'],['For Peace','Her GitHub is her portfolio and her proof']]}},
+  {id:'w2006',yr:'2006',place:'us',title:'The cloud arrives',
+   brief:{eyebrow:'Anyone can afford a data centre',why:'Amazon began renting computing power by the hour. Suddenly a student with a laptop could run software on the same infrastructure as a large company, paying only for what they used. This single shift is why a teenager can now launch a product to the whole world from a bedroom.',
+     facts:[['What changed','Computing became something you rent, not own'],['The effect','Startups \u2014 and students \u2014 could compete']]}},
+  {id:'w2012',yr:'2012',place:'int',title:'AlexNet \u2014 the spark that lit modern AI',
+   brief:{eyebrow:'The turn',why:'A neural network won a major image-recognition contest by a wide margin, trained on ordinary gaming graphics cards. It proved deep learning worked, and set off everything that followed \u2014 including the AI that now writes code alongside engineers.',
+     facts:[['What','Deep learning trained on GPUs'],['Consequence','The modern AI era, and eventually AI that writes software']]}}
+ ]},
+ {decade:'2020s',theme:'When software began writing itself',beats:[
+  {id:'w2021',yr:'2021',place:'us',title:'AI starts writing code beside us',
+   brief:{eyebrow:'The tool that changed the job',why:'GitHub Copilot put an AI assistant directly inside the editor, suggesting whole functions as engineers typed. For the first time in the history of the craft, the machine was writing the code rather than only running it. Within a few years this became normal practice.',
+     facts:[['What','AI suggesting code as you write'],['Then','ChatGPT and agentic tools made it ordinary']]}},
+  {id:'w2025',yr:'2024\u201326',place:'us',title:'The market splits in two',
+   brief:{eyebrow:'The hard truth, told plainly',why:'AI is very good at routine, codifiable work, and entry-level generalist roles have contracted sharply \u2014 postings down roughly 28% from their 2022 peak, with new graduates making up only about 7% of Big Tech hires. At the same time, the field did not collapse: the US Bureau of Labor Statistics still projects 15% growth for software developers from 2024 to 2034, and AI, security, data and platform specialists are in short supply. The role is shifting toward design, review and orchestration rather than disappearing.',
+     facts:[['Squeezed','Routine coding and entry-level generalist roles'],['Growing','AI/ML, security, data, platform \u2014 a reported 500,000+ open AI roles globally'],['BLS outlook','15% growth for developers, 2024\u20132034'],['The shift','From typing code to designing, reviewing and deciding']],
+     quiz:[{q:'What kind of software work is AI squeezing hardest?',opts:['System design and architecture','Routine, boilerplate coding','Security judgment'],a:1,ex:'Routine and boilerplate coding. System design and security judgment are rising in value \u2014 which is exactly what to aim for.'}]}},
+  {id:'w2026',yr:'2026',place:'int',title:'Judgment becomes the job',
+   brief:{eyebrow:'Where this leaves her',why:'The consistent finding across the industry is this: developers who only typed code are being replaced; developers who reason about systems are more valuable than ever. System design and distributed architecture now rank as the most AI-resistant engineering skill there is. The floor rose \u2014 anyone can scaffold an app. But the ceiling rose too.',
+     facts:[['Most AI-resistant','System design and architecture'],['Also rising','Security, debugging, code review, communication'],['The rule','Use AI to go faster. Never use it to skip understanding.']],
+     scrip:{t:'For the LORD giveth wisdom: out of his mouth cometh knowledge and understanding.',r:'Proverbs 2:6'}}}
+ ]}
+];
+var FRONTIER=[
+ {id:'f-arch',ic:'\ud83d\udcd0',tag:'Durable',tagc:'t-near',h:'System design & architecture',p:'The most AI-resistant skill in the whole field.',
+  brief:{eyebrow:'The next ten years',why:'AI will hand you three valid approaches with confident reasoning for each. Choosing between them \u2014 under real constraints, for real users, over real years \u2014 is the work it cannot do. This is the skill to build a career on.'}},
+ {id:'f-aiapp',ic:'\ud83e\udde0',tag:'Near',tagc:'t-near',h:'Building AI-powered applications',p:'LLM APIs, retrieval, evaluation, guardrails, agents.',
+  brief:{eyebrow:'The next ten years',why:'Described as the most durable upskilling path in software today. You do not have to build the models \u2014 you build the products that use them well and safely.'}},
+ {id:'f-sec',ic:'\ud83d\udd10',tag:'Near',tagc:'t-near',h:'Security engineering',p:'More generated code means more holes. Judgment is scarce.',
+  brief:{eyebrow:'The next ten years',why:'Security is one of the areas engineers explicitly do not trust AI to handle alone. As AI writes more code, the need for people who can judge whether it is safe grows sharply.'}},
+ {id:'f-agent',ic:'\ud83e\udd16',tag:'Near',tagc:'t-near',h:'Working with agents, not just assistants',p:'Scoping tasks for AI, managing context, reviewing what it produces.',
+  brief:{eyebrow:'The next ten years',why:'The engineers pulling ahead are not the ones who autocomplete faster \u2014 they are the ones who know how to scope work for agentic tools and review AI-generated changes critically.'}},
+ {id:'f-verify',ic:'\u2705',tag:'Open',tagc:'t-open',h:'Proving software is correct',p:'How do we trust code no human fully read?',
+  brief:{eyebrow:'The next ten years',why:'As more code is machine-written, verification, testing strategy and formal methods become urgent. Whoever makes AI-written software provably trustworthy solves a problem the whole industry has.'}},
+ {id:'f-own',ic:'\ud83d\ude80',tag:'Near',tagc:'t-near',h:'The one-person company',p:'AI made building cheap. A single skilled builder can now ship what took a team.',
+  brief:{eyebrow:'The next ten years',why:'This is the quiet good news. The same tools squeezing junior employment have made founding something dramatically cheaper. For someone who wants to own rather than be hired, this is the best moment in the history of software.'}}
+];
+var PROBLEMS=[
+ {id:'p-pipeline',ic:'\ud83e\ude9c',tag:'Urgent',tagc:'t-open',h:'The junior pipeline is breaking',p:'If nobody hires beginners, where do senior engineers come from?',
+  brief:{eyebrow:'An invitation',why:'Entry-level postings have fallen sharply while AI absorbs routine work. But every senior engineer alive was once a junior. Some enterprises have kept hiring juniors precisely because they know this. Solving how the next generation is trained \u2014 as a leader, a teacher, or a founder who hires young people \u2014 is real and urgent work.',
+    facts:[['The squeeze','Entry-level postings down sharply from 2022'],['The contradiction','Future seniors must come from somewhere'],['Her role','One day, be the one who hires and trains them']],
+    scrip:{t:'Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.',r:'Proverbs 27:17'}}},
+ {id:'p-trust',ic:'\ud83d\udd0d',tag:'Unsolved',tagc:'t-open',h:'Code nobody fully understands',p:'AI writes it, we ship it \u2014 and cannot always explain it.',
+  brief:{eyebrow:'An invitation',why:'Engineers report not trusting AI output for deployment, security or planning. Yet more of it ships every day. Building the tools and practices that verify machine-written code is one of the defining problems of her generation.',
+    facts:[['The risk','Software running the world that few people have read'],['The work','Verification, testing, formal methods, review culture']]}},
+ {id:'p-sec',ic:'\ud83d\udee1\ufe0f',tag:'Growing',tagc:'t-open',h:'Security at machine speed',p:'AI can generate vulnerabilities as fast as it generates features.',
+  brief:{eyebrow:'An invitation',why:'Every line of code is a potential door. When code is produced far faster than humans can review it, the attack surface grows faster than the defence. Security engineers are scarce and will stay scarce.',
+    facts:[['The imbalance','Code generated faster than it can be reviewed'],['The need','People with genuine security judgment']]}},
+ {id:'p-fail',ic:'\u26a0\ufe0f',tag:'Serious',tagc:'t-open',h:'Software still kills people when it fails',p:'Medical devices, aircraft, cars \u2014 bugs are not always harmless.',
+  brief:{eyebrow:'An invitation',why:'Software now flies aircraft, doses medicine and drives cars. Failures in such systems have cost lives. This is why engineering discipline \u2014 testing, review, humility \u2014 is a moral matter and not merely a technical one.',
+    facts:[['The stakes','Planes, hospitals, vehicles, infrastructure'],['The discipline','Test, review, and never assume it works']],
+    scrip:{t:'When thou buildest a new house, then thou shalt make a battlement for thy roof.',r:'Deuteronomy 22:8'}}},
+ {id:'p-women',ic:'\u2640\ufe0f',tag:'Unfinished',tagc:'t-open',h:'Women started this field and left it',p:'Ada, Grace, Margaret, Annie \u2014 and yet women are now a minority in software.',
+  brief:{eyebrow:'An invitation',why:'The first programmer was a woman. The first compiler was built by a woman. Apollo\u2019s flight software was led by a woman. Yet women became a shrinking minority in computing as the field grew prestigious and well paid. Peace walking into this field is not an intrusion \u2014 it is a homecoming. And helping other girls follow is work worth doing.',
+    facts:[['The history','Ada Lovelace, Grace Hopper, Margaret Hamilton, Annie Easley'],['The present','Women remain a minority in software engineering'],['The invitation','Come back, and bring others']],
+    scrip:{t:'She girdeth her loins with strength, and strengtheneth her arms.',r:'Proverbs 31:17'}}},
+ {id:'p-access',ic:'\ud83c\udf0d',tag:'Justice',tagc:'t-open',h:'Most of the world cannot build',p:'Software is written by a fraction of humanity, for all of it.',
+  brief:{eyebrow:'An invitation',why:'The tools are free and the internet is everywhere, yet the people who build software remain concentrated in a few places. Software built by people who understand Lagos, or Columbus, or a small church community, will serve them better than software built by strangers.',
+    facts:[['The gap','Building concentrated in few places'],['The opportunity','Build for the people you actually know']],
+    scrip:{t:'Go ye into all the world.',r:'Mark 16:15'}}}
+];
+var MISSIONS=[
+ {id:'arch',h:'I will design the systems, not just the code',p:'Master architecture \u2014 the skill AI cannot take.',line:'to design systems that hold \u2014 the work no machine can do for me.'},
+ {id:'ai',h:'I will build with AI, not be replaced by it',p:'Create AI-powered products that serve real people.',line:'to build with AI rather than be replaced by it.'},
+ {id:'sec',h:'I will keep software safe',p:'Security engineering \u2014 guard what everyone else is building.',line:'to guard what the world is building \u2014 to keep software safe.'},
+ {id:'trust',h:'I will make software you can trust',p:'Verification and quality, so machine-written code can be relied on.',line:'to make software trustworthy in an age when machines write it.'},
+ {id:'girls',h:'I will bring other girls with me',p:'This field was started by women. Help them come home to it.',line:'to bring other girls into a field women began \u2014 and to leave the door open.'},
+ {id:'own',h:'I will build and own it',p:'Found a company, employ people, and run it well.',line:'to build and own something that gives other people work.'}
+];
+var PMAP={'p-pipeline':'girls','p-trust':'trust','p-sec':'sec','p-fail':'trust','p-women':'girls','p-access':'own'};
+var CARSON={name:'Annie Easley',role:'Her job was automated. She became essential.',
+ brief:{eyebrow:'A story to carry',
+  why:'Annie Easley was born in Birmingham, Alabama in 1933 and raised by a single mother who insisted she get an education in a segregated South that offered her very little. She studied pharmacy, but when she moved to Cleveland, Ohio, the only pharmacy programme in the region had closed. In 1955 she read a newspaper story about twin sisters working as \u201chuman computers\u201d \u2014 people who did complex calculations by hand for engineers. She applied the next day and was hired within two weeks, one of only four African Americans among around 2,500 people in her division. Then the thing happened that should frighten anyone reading this in the age of AI: machines replaced the human computers. Her entire job was automated away. Annie Easley evolved along with the technology. She taught herself programming, learned Fortran, and became a computer scientist \u2014 writing code that analysed energy systems, contributed to battery technology behind early hybrid vehicles, and supported the Centaur rocket stage, the upper stage behind launches including the Cassini mission to Saturn. In the 1970s, while working full time, she went back to school one class at a time and earned a mathematics degree from Cleveland State in 1977. She was denied education funding other employees received. She became an equal employment opportunity counsellor, handling discrimination complaints, and spent years in outreach encouraging women and young people of colour into science. She worked at NASA for 34 years. Her job was taken by a machine, and she made herself more valuable than the machine that took it.',
+  facts:[['Born','1933, Birmingham, Alabama \u2014 raised by a single mother'],['Where she worked','NASA in Cleveland, Ohio \u2014 34 years'],['The turn','Machines replaced human computers; she learned to program them'],['Her code','Energy systems, hybrid-vehicle battery technology, the Centaur rocket'],['The degree','Mathematics, Cleveland State, 1977 \u2014 earned while working full time'],['Her other work','Fought discrimination; encouraged women and minorities into STEM']],
+  quiz:[{q:'What happened to Annie Easley\u2019s original job?',opts:['She was promoted out of it','Machines replaced it \u2014 so she learned to program the machines','She resigned'],a:1,ex:'Her job as a human computer was automated away. Instead of being displaced, she learned programming and became a computer scientist. That is the whole lesson for the age of AI.'}],
+  scrip:{t:'But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.',r:'Isaiah 40:31'}}};
+var MENTORS=[
+ {now:'Start here',h:'Girls Who Code',tag:'Free clubs & summer programmes',p:'Free clubs and summer immersion programmes made for girls, including students exactly Peace\u2019s age. Learning beside other girls changes what she believes is possible.',facts:['Free to join','Clubs, summer programmes, national community'],href:'https://girlswhocode.com',cta:'Find a club'},
+ {h:'Black Girls CODE',tag:'Community & workshops',p:'Workshops, camps and chapters built to put Black girls at the centre of technology rather than the margins.',facts:['Hands-on workshops','A community that looks like her'],href:'https://www.blackgirlscode.com',cta:'Explore programs'},
+ {now:'Build something',h:'Technovation Girls',tag:'An app that solves a real problem',p:'Girls team up with a mentor to build a real app solving a problem in their own community, then compete globally. Coding and entrepreneurship together \u2014 exactly the founder instinct Peace already has.',facts:['Mentor-guided teams','Code + business in one'],href:'https://www.technovation.org',cta:'See Technovation'},
+ {h:'NCWIT Aspirations in Computing',tag:'Award & network',p:'A national award for high-school girls in computing, carrying scholarships, recognition and a lasting network. Worth applying every year she is eligible.',facts:['Scholarships and recognition','Opens internship doors'],href:'https://www.aspirations.org',cta:'See the award'},
+ {h:'Learn free \u2014 CS50 & freeCodeCamp',tag:'Free forever',p:'Harvard\u2019s CS50 and freeCodeCamp can take her from nothing to building real software at no cost. Use them alongside school, not instead of it.',facts:['World-class and free','Project-based'],href:'https://cs50.harvard.edu/x/',cta:'Start CS50'},
+ {h:'Ohio State & Columbus tech',tag:'Close to home',p:'Ohio State has a strong computer science programme, and Columbus is a genuine tech city \u2014 JPMorgan Chase, Nationwide, Cardinal Health, Huntington, and a growing startup scene.',facts:['Strong CS programme nearby','Real internship pipelines'],href:'https://cse.osu.edu',cta:'See OSU CSE'},
+ {h:'How to find a mentor of your own',tag:'Do this now',p:'Ask your maths or computer teacher who they know. Ask at church \u2014 someone in the congregation writes software. Then ask that person for thirty minutes and bring real questions. People invest in the curious and the faithful.',facts:['Ask teachers, church, family network','Be curious, be reliable, say thank you'],href:'https://girlswhocode.com',cta:'Girls Who Code'}
+];
+
+/* ---------------- ENGINE ---------------- */
+function el(id){return document.getElementById(id);}
+function allBeats(){var a=[];for(var i=0;i<ERAS.length;i++){for(var j=0;j<ERAS[i].beats.length;j++){a.push(ERAS[i].beats[j]);}}return a;}
+function totalExplorable(){return allBeats().length+FRONTIER.length+PROBLEMS.length;}
+function readCount(){var n=0;for(var k in state.read){if(state.read[k]){n++;}}return n;}
+
+function renderHero(){el('heroName').innerHTML=state.name?state.name:'&nbsp;';
+  var pct=Math.round((readCount()/totalExplorable())*100);el('pct').innerHTML=pct+'%';el('barFill').style.width=pct+'%';
+  var mh=el('heroMission');
+  if(state.mission){var m=findMission(state.mission);mh.innerHTML='Mission: <b>'+m.h+'</b>';}
+  else{mh.innerHTML='<span style="color:#c99aa8">No mission chosen yet &mdash; find yours in <b style="color:#E4C877">Your Mission</b></span>';}}
+function findMission(id){for(var i=0;i<MISSIONS.length;i++){if(MISSIONS[i].id===id){return MISSIONS[i];}}return null;}
+
+function renderTimeline(){var box=el('timeline');box.innerHTML='';
+  for(var i=0;i<ERAS.length;i++){var era=ERAS[i];
+    var wrap=document.createElement('div');wrap.className='era';
+    var h='<div class="era-head"><span class="era-decade">'+era.decade+'</span><span class="era-theme">'+era.theme+'</span></div>';
+    for(var j=0;j<era.beats.length;j++){var b=era.beats[j];var rd=state.read[b.id]?' read':'';
+      var tagc=(b.place==='us')?'p-us':'p-int';var tagt=(b.place==='us')?'United States':'International';
+      h+='<div class="beat'+rd+'"><div class="spine"></div><div class="pulse"></div>'+
+         '<div class="mrow" data-id="'+b.id+'" data-kind="beat"><span class="yr">'+b.yr+'</span>'+
+         '<span class="mtitle">'+b.title+'<span class="tagp '+tagc+'">'+tagt+'</span></span><span class="chev">&#8250;</span></div></div>';}
+    wrap.innerHTML=h;box.appendChild(wrap);}
+  bindRows();}
+function renderFrontier(){var box=el('frontierList');box.innerHTML='';
+  for(var i=0;i<FRONTIER.length;i++){var f=FRONTIER[i];var rd=state.read[f.id]?'':'';
+    var d=document.createElement('div');d.className='fcard';d.setAttribute('data-id',f.id);d.setAttribute('data-kind','frontier');
+    d.innerHTML='<span class="ic">'+f.ic+'</span><span class="ptag '+f.tagc+'">'+f.tag+'</span><h4>'+f.h+'</h4><p>'+f.p+'</p><span class="chev">&#8250;</span>';
+    box.appendChild(d);}bindCards('frontierList');}
+function renderProblems(){var box=el('problemList');box.innerHTML='';
+  for(var i=0;i<PROBLEMS.length;i++){var p=PROBLEMS[i];
+    var d=document.createElement('div');d.className='fcard';d.setAttribute('data-id',p.id);d.setAttribute('data-kind','problem');
+    d.innerHTML='<span class="ic">'+p.ic+'</span><span class="ptag '+p.tagc+'">'+p.tag+'</span><h4>'+p.h+'</h4><p>'+p.p+'</p><span class="chev">&#8250;</span>';
+    box.appendChild(d);}bindCards('problemList');}
+function renderMentors(){var box=el('mentorList');box.innerHTML='';
+  for(var i=0;i<MENTORS.length;i++){var r=MENTORS[i];var f='';for(var j=0;j<r.facts.length;j++){f+='<p class="fact">'+r.facts[j]+'</p>';}
+    var d=document.createElement('div');d.className='res';
+    d.innerHTML=(r.now?'<span class="now">'+r.now+'</span>':'')+'<h4>'+r.h+'</h4><div class="tagline">'+r.tag+'</div><p>'+r.p+'</p>'+f+'<a href="'+r.href+'" target="_blank" rel="noopener">'+r.cta+' &rarr;</a>';
+    box.appendChild(d);}}
+function renderMission(){var box=el('missionList');box.innerHTML='';
+  var cur=el('mCurrent');
+  if(state.mission){var m=findMission(state.mission);cur.style.display='block';
+    el('mCurrentVal').innerHTML=(state.name?state.name:'I')+', your mission is <b>'+m.line+'</b>';}
+  else{cur.style.display='none';}
+  for(var i=0;i<MISSIONS.length;i++){var mo=MISSIONS[i];var sel=(state.mission===mo.id)?' sel':'';
+    var d=document.createElement('div');d.className='mopt'+sel;d.setAttribute('data-id',mo.id);
+    d.innerHTML='<h5>'+mo.h+'</h5><p>'+mo.p+'</p><span class="pick">'+(state.mission===mo.id?'Your mission':'Choose this')+'</span>';
+    box.appendChild(d);}
+  var opts=box.querySelectorAll('.mopt');
+  for(var k=0;k<opts.length;k++){opts[k].addEventListener('click',function(){chooseMission(this.getAttribute('data-id'));});}}
+
+function chooseMission(id){var changed=(state.mission!==id);state.mission=id;lsSet(K.mission,id);renderMission();renderHero();
+  if(changed){var m=findMission(id);bigBurst();toast('Mission set: '+m.h);safeSpeak((state.name?state.name+', ':'')+'your mission is '+m.line);}}
+
+/* Brief screen */
+var BRIEF_ID=null,BRIEF_KIND=null,PUSHED=false;
+function dataFor(id,kind){if(kind==='hero'){return CARSON;}
+  if(kind==='beat'){var bs=allBeats();for(var i=0;i<bs.length;i++){if(bs[i].id===id){return bs[i];}}}
+  if(kind==='frontier'){for(var j=0;j<FRONTIER.length;j++){if(FRONTIER[j].id===id){return FRONTIER[j];}}}
+  if(kind==='problem'){for(var k=0;k<PROBLEMS.length;k++){if(PROBLEMS[k].id===id){return PROBLEMS[k];}}}return null;}
+function openBrief(id,kind){var item=dataFor(id,kind);if(!item){return;}var b=item.brief;
+  var tag,title,meta;
+  if(kind==='hero'){tag='A story to carry';title=item.name;meta=item.role;}
+  else if(kind==='beat'){tag=(item.place==='us')?'USA':'World';title=item.title;meta=item.yr+' &middot; '+b.eyebrow;}
+  else if(kind==='frontier'){tag='Frontier';title=item.h;meta=b.eyebrow;}
+  else{tag='Open problem';title=item.h;meta=b.eyebrow;}
+  el('briefTag').innerHTML=tag;
+  el('briefBody').innerHTML='<div class="brief-eyebrow">'+b.eyebrow+'</div><h1 class="brief-title">'+title+'</h1><div class="brief-meta">'+meta+'</div>'+buildBlocks(b);
+  el('briefBody').scrollTop=0;
+  var foot=el('briefFoot');
+  if(kind==='problem'&&missionForProblem(id)){foot.style.display='block';setClaimBtn(id);}
+  else{foot.style.display='none';}
+  BRIEF_ID=id;BRIEF_KIND=kind;
+  if(kind!=='hero'){state.read[id]=true;saveRead();}
+  var sc=el('brief');sc.className='brief-screen open';sc.setAttribute('aria-hidden','false');bindQuiz();bindSay();
+  try{if(!PUSHED){history.pushState({b:1},'');PUSHED=true;}}catch(e){}}
+function closeBrief(fromPop){var sc=el('brief');sc.className='brief-screen';sc.setAttribute('aria-hidden','true');
+  BRIEF_ID=null;BRIEF_KIND=null;renderHero();renderTimeline();
+  if(!fromPop&&PUSHED){try{history.back();}catch(e){}PUSHED=false;}else{PUSHED=false;}}
+function missionForProblem(pid){return PMAP[pid];}
+function setClaimBtn(pid){var mid=missionForProblem(pid);var btn=el('claimBtn');
+  if(state.mission===mid){btn.className='foot-btn claimed';btn.innerHTML='&#10003; This is your mission';}
+  else{btn.className='foot-btn claim';btn.innerHTML='Make this my mission';}}
+function buildBlocks(b){var h='';
+  if(b.why){h+='<div class="blk"><p class="blk-h">&#10084; The story</p><p>'+b.why+'</p></div>';}
+  if(b.facts){var fh='';for(var i=0;i<b.facts.length;i++){fh+='<div class="factline"><b>'+b.facts[i][0]+':</b><span>'+b.facts[i][1]+'</span></div>';}h+='<div class="blk"><p class="blk-h">&#9873; Key facts</p>'+fh+'</div>';}
+  if(b.quiz){h+=buildQuiz(b.quiz);}
+  if(b.links){var lh='';for(var j=0;j<b.links.length;j++){lh+='<a class="lnk" href="'+b.links[j][1]+'" target="_blank" rel="noopener">'+b.links[j][0]+'</a>';}h+='<div class="blk"><p class="blk-h">&#128279; Go further</p>'+lh+'</div>';}
+  if(b.scrip){h+='<div class="brief-scrip"><p>&ldquo;'+b.scrip.t+'&rdquo;</p><b>'+b.scrip.r+'</b><button class="say" data-say="'+encodeURIComponent(b.scrip.t)+'">&#9654; Read aloud</button></div>';}
+  return h;}
+function buildQuiz(qs){var h='<div class="blk"><p class="blk-h">&#127919; Test yourself</p>';
+  for(var i=0;i<qs.length;i++){var q=qs[i];var opts='';for(var j=0;j<q.opts.length;j++){opts+='<button class="opt" data-q="'+i+'" data-o="'+j+'" data-a="'+q.a+'">'+q.opts[j]+'</button>';}
+    h+='<div class="q"><div class="qq">'+q.q+'</div>'+opts+'<div class="qex" data-ex="'+i+'">'+q.ex+'</div></div>';}
+  return h+'</div>';}
+
+function bindRows(){var rows=document.querySelectorAll('#timeline .mrow');
+  for(var i=0;i<rows.length;i++){rows[i].addEventListener('click',function(){openBrief(this.getAttribute('data-id'),'beat');});}}
+function bindCards(listId){var cards=document.querySelectorAll('#'+listId+' .fcard');
+  for(var i=0;i<cards.length;i++){cards[i].addEventListener('click',function(){openBrief(this.getAttribute('data-id'),this.getAttribute('data-kind'));});}}
+function bindQuiz(){var opts=el('briefBody').querySelectorAll('.opt');
+  for(var i=0;i<opts.length;i++){opts[i].addEventListener('click',function(){var qi=this.getAttribute('data-q');var chosen=parseInt(this.getAttribute('data-o'),10);var ans=parseInt(this.getAttribute('data-a'),10);
+    var group=el('briefBody').querySelectorAll('.opt[data-q="'+qi+'"]');
+    for(var j=0;j<group.length;j++){group[j].disabled=true;var oj=parseInt(group[j].getAttribute('data-o'),10);if(oj===ans){group[j].className='opt correct';}else if(oj===chosen){group[j].className='opt wrong';}}
+    var ex=el('briefBody').querySelector('.qex[data-ex="'+qi+'"]');if(ex){ex.className='qex show';}if(chosen===ans){burst();}});}}
+function bindSay(){var btns=el('briefBody').querySelectorAll('.say');for(var i=0;i<btns.length;i++){btns[i].addEventListener('click',function(e){e.stopPropagation();safeSpeak(decodeURIComponent(this.getAttribute('data-say')));});}}
+
+function bindTabs(){var tabs=document.querySelectorAll('#tabs .tab');
+  for(var i=0;i<tabs.length;i++){tabs[i].addEventListener('click',function(){var v=this.getAttribute('data-v');var all=document.querySelectorAll('#tabs .tab');
+    for(var j=0;j<all.length;j++){all[j].className='tab';}this.className='tab on';var views=document.querySelectorAll('.view');for(var k=0;k<views.length;k++){views[k].className='view';}el('v-'+v).className='view on';window.scrollTo(0,0);});}}
+
+function safeSpeak(txt){try{if(!('speechSynthesis' in window)){return;}window.speechSynthesis.cancel();var u=new window.SpeechSynthesisUtterance(txt);u.rate=.92;u.pitch=1.02;window.speechSynthesis.speak(u);}catch(e){}}
+var toastT=null;function toast(m){var t=el('toast');t.innerHTML=m;t.className='show';if(toastT){clearTimeout(toastT);}toastT=setTimeout(function(){t.className='';},2400);}
+var cvs,ctx,parts=[],raf=null;
+function initFx(){cvs=el('cfx');ctx=cvs.getContext('2d');resizeFx();window.addEventListener('resize',resizeFx);}
+function resizeFx(){if(!cvs){return;}cvs.width=window.innerWidth;cvs.height=window.innerHeight;}
+function spawn(n){var colors=['#E4576E','#C4324B','#E4C877','#3FB8A0','#F5F7FA'];for(var i=0;i<n;i++){parts.push({x:cvs.width/2+(Math.random()-.5)*160,y:cvs.height*.3,vx:(Math.random()-.5)*7,vy:Math.random()*-9-3,g:.24,s:Math.random()*7+4,c:colors[(Math.random()*colors.length)|0],rot:Math.random()*6,vr:(Math.random()-.5)*.4,life:70+Math.random()*30});}if(!raf){tick();}}
+function tick(){ctx.clearRect(0,0,cvs.width,cvs.height);for(var i=parts.length-1;i>=0;i--){var p=parts[i];p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life--;
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.55);ctx.restore();if(p.life<=0||p.y>cvs.height+30){parts.splice(i,1);}}
+  if(parts.length){raf=window.requestAnimationFrame(tick);}else{raf=null;ctx.clearRect(0,0,cvs.width,cvs.height);}}
+function burst(){spawn(24);}function bigBurst(){spawn(90);}
+
+function showApp(){el('cover').style.display='none';el('app').style.display='block';renderAll();}
+function renderAll(){renderHero();renderTimeline();renderFrontier();renderProblems();renderMentors();renderMission();}
+function begin(){var nm=el('nm').value.replace(/\s+/g,' ').trim();if(!nm){el('nm').focus();el('nm').style.borderColor='#E4576E';return;}
+  state.name=nm;lsSet(K.name,nm);showApp();toast('Welcome, '+nm+'.');}
+function init(){loadState();initFx();bindTabs();
+  el('begin').addEventListener('click',begin);
+  el('nm').addEventListener('keydown',function(e){if(e.keyCode===13){begin();}});
+  el('carsonCard').addEventListener('click',function(){openBrief('carson','hero');});
+  el('backBtn').addEventListener('click',function(){closeBrief(false);});
+  window.addEventListener('popstate',function(){if(BRIEF_ID){closeBrief(true);}});
+  el('claimBtn').addEventListener('click',function(){if(BRIEF_KIND==='problem'&&BRIEF_ID){var mid=missionForProblem(BRIEF_ID);chooseMission(mid);setClaimBtn(BRIEF_ID);}});
+  el('editBtn').addEventListener('click',function(){var nm=window.prompt('Name:',state.name);if(nm!==null&&nm.replace(/\s+/g,' ').trim()){state.name=nm.replace(/\s+/g,' ').trim();lsSet(K.name,state.name);renderHero();renderMission();}});
+  if(state.name){showApp();}}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+</script>
+</body>
+</html>
